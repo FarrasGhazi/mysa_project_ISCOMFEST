@@ -36,7 +36,7 @@ function updateCamera() {
 updateCamera()
 
 // ---------- 4. Cahaya ----------
-scene.add(new THREE.AmbientLight(0xffffff, 0.9))
+scene.add(new THREE.AmbientLight(0xffffff, 1.3))
 
 const sun = new THREE.DirectionalLight(0xffffff, 1.6)
 sun.position.set(6, 10, 4)
@@ -58,8 +58,8 @@ function makeBox(w, h, d, color, x, y, z) {
 }
 
 // ---------- 6. Ruangan: lantai + 2 dinding ----------
-const FLOOR_COLOR = 0xa57c5b
-const WALL_COLOR = 0xff6b5e
+const FLOOR_COLOR = 0xb98b66
+const WALL_COLOR = 0xff7566
 
 // lantai: permukaan atas di y = 0, mencakup area 0..ROOM_W x 0..ROOM_D
 makeBox(ROOM_W, 0.2, ROOM_D, FLOOR_COLOR, ROOM_W / 2, -0.1, ROOM_D / 2)
@@ -71,6 +71,46 @@ makeBox(ROOM_W + WALL_T, ROOM_H, WALL_T, WALL_COLOR,
 // dinding kiri (sepanjang Z, di sisi x = 0)
 makeBox(WALL_T, ROOM_H, ROOM_D, WALL_COLOR,
   -WALL_T / 2, ROOM_H / 2, ROOM_D / 2)
+
+// ---------- 6b. Furnitur: kasur ----------
+// Semua ukuran dalam meter. (x, z) = pusat kasur di lantai.
+function makeBed(width, length, x, z) {
+  const group = new THREE.Group()
+
+  // rangka kayu
+  const frame = new THREE.Mesh(
+    new THREE.BoxGeometry(width, 0.25, length),
+    new THREE.MeshStandardMaterial({ color: 0x6b4a32 })
+  )
+  frame.position.y = 0.125
+
+  // kasur
+  const mattress = new THREE.Mesh(
+    new THREE.BoxGeometry(width - 0.06, 0.18, length - 0.06),
+    new THREE.MeshStandardMaterial({ color: 0xf2ead8 })
+  )
+  mattress.position.y = 0.25 + 0.09
+
+  // bantal (di ujung z negatif = dekat dinding belakang)
+  const pillow = new THREE.Mesh(
+    new THREE.BoxGeometry(width - 0.3, 0.1, 0.35),
+    new THREE.MeshStandardMaterial({ color: 0xffffff })
+  )
+  pillow.position.set(0, 0.25 + 0.18 + 0.05, -length / 2 + 0.3)
+
+  for (const part of [frame, mattress, pillow]) {
+    part.castShadow = true
+    part.receiveShadow = true
+    group.add(part)
+  }
+
+  group.position.set(x, 0, z)
+  scene.add(group)
+  return group
+}
+
+// kasur single 90 x 200 cm, rapat ke dinding belakang
+makeBed(0.9, 2.0, 0.6, 1.1)
 
 // ---------- 7. Render ----------
 window.addEventListener('resize', () => {
