@@ -1,5 +1,33 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { height: 100%; overflow: hidden; background: #5b6770; }
+html, body { height: 100%; overflow: hidden; background: #5b6770;
+  font-family: system-ui, sans-serif; }
 #app { width: 100%; height: 100%; }
-canvas { display: block; }
-canvas { touch-action: none; }
+canvas { display: block; touch-action: none; }
+
+#panel {
+  position: fixed; top: 16px; left: 16px; width: 220px;
+  background: #fff; border-radius: 12px; padding: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+#panel h1 { font-size: 18px; margin-bottom: 10px; color: #e0554a; }
+#panel h2 { font-size: 13px; margin: 10px 0 6px; color: #444; }
+#catalog { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+#panel button {
+  padding: 8px; border: 0; border-radius: 8px; cursor: pointer;
+  background: #ff7566; color: #fff; font-weight: 600;
+}
+#panel button:hover { filter: brightness(1.08); }
+#panel button.danger { background: #555; }
+#panel label { display: block; font-size: 13px; color: #333; margin-bottom: 6px; }
+#panel input {
+  width: 100%; padding: 6px; margin-top: 2px;
+  border: 1px solid #ccc; border-radius: 6px;
+}
+#panel .row { display: flex; gap: 6px; margin-top: 8px; }
+#panel .row button { flex: 1; }
+#edit[hidden] { display: none; }
+
+@media (max-width: 700px) {
+  #panel { top: auto; bottom: 0; left: 0; right: 0; width: auto;
+    border-radius: 12px 12px 0 0; max-height: 45vh; overflow: auto; }
+}

@@ -7,6 +7,31 @@
   </head>
   <body>
     <div id="app"></div>
+        <div id="app"></div>
+
+    <aside id="panel">
+      <h1>KosPlanner</h1>
+      <h2>Tambah furnitur</h2>
+      <div id="catalog">
+        <button data-type="bed">Kasur</button>
+        <button data-type="desk">Meja belajar</button>
+        <button data-type="wardrobe">Lemari</button>
+        <button data-type="chair">Kursi</button>
+      </div>
+
+      <div id="edit" hidden>
+        <h2 id="sel-name">Furnitur</h2>
+        <label>Lebar (cm) <input id="in-w" type="number" min="30" max="300" step="5" /></label>
+        <label>Dalam (cm) <input id="in-d" type="number" min="30" max="300" step="5" /></label>
+        <label>Tinggi (cm) <input id="in-h" type="number" min="10" max="300" step="5" /></label>
+        <div class="row">
+          <button id="btn-rotate">Putar 90°</button>
+          <button id="btn-delete" class="danger">Hapus</button>
+        </div>
+      </div>
+    </aside>
+
+    <script type="module" src="/src/main.js"></script>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
