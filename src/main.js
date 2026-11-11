@@ -110,7 +110,69 @@ function makeBed(width, length, x, z) {
 }
 
 // kasur single 90 x 200 cm, rapat ke dinding belakang
-makeBed(0.9, 2.0, 0.6, 1.1)
+const bed = makeBed(0.9, 2.0, 0.6, 1.1)
+
+// ---------- 6c. Drag furnitur ----------
+const SNAP = 0.05 // snap ke 5 cm
+const raycaster = new THREE.Raycaster()
+const pointer = new THREE.Vector2()
+const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0) // bidang y = 0
+const hitPoint = new THREE.Vector3()
+
+const draggables = [bed]   // daftar furnitur yang bisa digeser
+let dragging = null
+const grabOffset = new THREE.Vector3()
+
+function setPointer(event) {
+  const rect = renderer.domElement.getBoundingClientRect()
+  pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+  pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+  raycaster.setFromCamera(pointer, camera)
+}
+
+function clampToRoom(obj) {
+  const box = new THREE.Box3().setFromObject(obj)
+  const halfW = (box.max.x - box.min.x) / 2
+  const halfD = (box.max.z - box.min.z) / 2
+  obj.position.x = Math.min(Math.max(obj.position.x, halfW), ROOM_W - halfW)
+  obj.position.z = Math.min(Math.max(obj.position.z, halfD), ROOM_D - halfD)
+}
+
+renderer.domElement.addEventListener('pointerdown', (event) => {
+  setPointer(event)
+  const hits = raycaster.intersectObjects(draggables, true)
+  if (hits.length === 0) return
+  // naik ke group induk yang ada di daftar draggables
+  let obj = hits[0].object
+  while (obj.parent && !draggables.includes(obj)) obj = obj.parent
+  dragging = obj
+  raycaster.ray.intersectPlane(floorPlane, hitPoint)
+  grabOffset.set(obj.position.x - hitPoint.x, 0, obj.position.z - hitPoint.z)
+  renderer.domElement.setPointerCapture(event.pointerId)
+  renderer.domElement.style.cursor = 'grabbing'
+})
+
+renderer.domElement.addEventListener('pointermove', (event) => {
+  setPointer(event)
+  if (!dragging) {
+    renderer.domElement.style.cursor =
+      raycaster.intersectObjects(draggables, true).length > 0 ? 'grab' : 'default'
+    return
+  }
+  if (!raycaster.ray.intersectPlane(floorPlane, hitPoint)) return
+  dragging.position.x = Math.round((hitPoint.x + grabOffset.x) / SNAP) * SNAP
+  dragging.position.z = Math.round((hitPoint.z + grabOffset.z) / SNAP) * SNAP
+  clampToRoom(dragging)
+})
+
+function endDrag(event) {
+  if (!dragging) return
+  dragging = null
+  renderer.domElement.releasePointerCapture(event.pointerId)
+  renderer.domElement.style.cursor = 'grab'
+}
+renderer.domElement.addEventListener('pointerup', endDrag)
+renderer.domElement.addEventListener('pointercancel', endDrag)
 
 // ---------- 7. Render ----------
 window.addEventListener('resize', () => {
