@@ -1,0 +1,117 @@
+// ui.js — panel HTML: tombol, kolom input, dan tampilan hasil analisis.
+import { CATALOG } from './config.js'
+import { state } from './state.js'
+import { addFurniture, removeFurniture, rebuild, clampXZ, collides } from './furniture.js'
+import { analyze, setHeatVisible } from './analysis.js'
+
+// ---------- Cari elemen HTML (ID harus sama persis dengan di index.html) ----------
+const editBox = document.getElementById('edit')
+const selName = document.getElementById('sel-name')
+const inW = document.getElementById('in-w')
+const inD = document.getElementById('in-d')
+const inH = document.getElementById('in-h')
+const inWalk = document.getElementById('in-walk')
+const chkHeat = document.getElementById('chk-heat')
+const verdictEl = document.getElementById('verdict')
+const scoreEl = document.getElementById('score')
+const notesEl = document.getElementById('notes')
+const toastEl = document.getElementById('toast')
+
+// ---------- Pesan singkat di bawah layar ----------
+let toastTimer
+export function toast(message) {
+  toastEl.textContent = message
+  toastEl.classList.add('show')
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200)
+}
+
+// ---------- Pilih furnitur dan isi panel edit ----------
+export function select(obj) {
+  state.selected = obj
+  if (!obj) { editBox.hidden = true; return }
+  const { type, w, d, h } = obj.userData
+  editBox.hidden = false
+  selName.textContent = CATALOG[type].label
+  inW.value = Math.round(w * 100)
+  inD.value = Math.round(d * 100)
+  inH.value = Math.round(h * 100)
+}
+
+function readSize(input, min, max, fallback) {
+  const cm = parseFloat(input.value)
+  if (Number.isNaN(cm)) return fallback
+  return Math.min(Math.max(cm, min), max) / 100
+}
+
+function applySize() {
+  const sel = state.selected
+  if (!sel) return
+  const u = sel.userData
+  const oldSize = { ...u }
+  const oldPos = sel.position.clone()
+
+  u.w = readSize(inW, 30, 300, u.w)
+  u.d = readSize(inD, 30, 300, u.d)
+  u.h = readSize(inH, 10, 300, u.h)
+  rebuild(sel)
+  const c = clampXZ(sel, sel.position.x, sel.position.z)
+  sel.position.x = c.x
+  sel.position.z = c.z
+
+  if (collides(sel, c.x, c.z)) {
+    Object.assign(u, oldSize) // batalkan: ukuran baru bertabrakan
+    rebuild(sel)
+    sel.position.copy(oldPos)
+    toast('Ukuran baru bertabrakan, dibatalkan')
+  }
+  select(sel)
+  state.dirty = true
+}
+
+// ---------- Tampilkan hasil analisis di panel ----------
+export function refreshAnalysis() {
+  const result = analyze(parseFloat(inWalk.value))
+  verdictEl.className = `badge ${result.status}`
+  verdictEl.textContent = result.text
+  scoreEl.textContent = `Skor kelegaan: ${result.score}%`
+  notesEl.innerHTML = result.notes.map((n) => `<li>${n}</li>`).join('')
+}
+
+// ---------- Pasang semua event (dijalankan sekali saat halaman dibuka) ----------
+export function initUI() {
+  for (const input of [inW, inD, inH]) input.addEventListener('change', applySize)
+
+  document.getElementById('btn-rotate').addEventListener('click', () => {
+    const sel = state.selected
+    if (!sel) return
+    sel.rotation.y += Math.PI / 2
+    const c = clampXZ(sel, sel.position.x, sel.position.z)
+    if (collides(sel, c.x, c.z)) {
+      sel.rotation.y -= Math.PI / 2
+      toast('Tidak muat kalau diputar di sini')
+      return
+    }
+    sel.position.x = c.x
+    sel.position.z = c.z
+    state.dirty = true
+  })
+
+  document.getElementById('btn-delete').addEventListener('click', () => {
+    if (!state.selected) return
+    removeFurniture(state.selected)
+    select(null)
+  })
+
+  document.querySelectorAll('[data-type]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const group = addFurniture(btn.dataset.type)
+      if (group) select(group)
+      else toast('Ruangan penuh, tidak ada tempat kosong')
+    })
+  })
+
+  inWalk.addEventListener('change', () => { state.dirty = true })
+  chkHeat.addEventListener('change', () => setHeatVisible(chkHeat.checked))
+  setHeatVisible(chkHeat.checked) // awal: sesuai kotak centang (kosong = nonaktif)
+}
