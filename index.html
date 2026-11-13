@@ -1,10 +1,12 @@
 <!doctype html>
 <html lang="id">
+
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mysa</title>
+    <title>KosPlanner</title>
   </head>
+
   <body>
     <div id="app"></div>
         <div id="app"></div>
@@ -29,20 +31,28 @@
           <button id="btn-delete" class="danger">Hapus</button>
         </div>
       </div>
+
       <h2>Jalur gerak</h2>
+
       <label>Lebar jalur minimum (cm)
         <input id="in-walk" type="number" min="40" max="80" step="5" value="60" />
       </label>
+
       <label class="check"><input id="chk-heat" type="checkbox" checked /> Tampilkan peta jalur</label>
+
       <div style="margin-top:8px">
         <span id="verdict" class="badge">-</span>
         <div id="score"></div>
         <ul id="notes"></ul>
       </div>
+
     </aside>
+
     <div id="toast"></div>
 
     <script type="module" src="/src/main.js"></script>
     <script type="module" src="/src/main.js"></script>
+    
   </body>
+
 </html>
