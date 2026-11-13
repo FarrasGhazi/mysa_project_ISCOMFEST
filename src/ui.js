@@ -1,8 +1,9 @@
 // ui.js — panel HTML: tombol, kolom input, dan tampilan hasil analisis.
-import { CATALOG } from './config.js'
+import { CATALOG, room } from './config.js'
 import { state } from './state.js'
-import { addFurniture, removeFurniture, rebuild, clampXZ, collides } from './furniture.js'
+import { addFurniture, removeFurniture, rebuild, clampXZ, collides, countNewlyOutside } from './furniture.js'
 import { analyze, setHeatVisible } from './analysis.js'
+import { setRoomSize } from './room.js'
 
 // ---------- Cari elemen HTML (ID harus sama persis dengan di index.html) ----------
 const editBox = document.getElementById('edit')
@@ -69,6 +70,40 @@ function applySize() {
   state.dirty = true
 }
 
+// ---------- Ukuran ruangan ----------
+const inRoomW = document.getElementById('room-w')
+const inRoomD = document.getElementById('room-d')
+
+function syncRoomInputs() {
+  inRoomW.value = Math.round(room.w * 100)
+  inRoomD.value = Math.round(room.d * 100)
+}
+
+// Baca kolom (cm), batasi 150-600, bulatkan ke 5 cm, ubah ke meter
+function readRoomCm(input) {
+  const cm = parseFloat(input.value)
+  if (Number.isNaN(cm)) return null
+  return (Math.round(Math.min(Math.max(cm, 150), 600) / 5) * 5) / 100
+}
+
+function applyRoomSize() {
+  const w = readRoomCm(inRoomW)
+  const d = readRoomCm(inRoomD)
+  if (w === null || d === null) {
+    toast('Isi lebar dan panjang ruangan dengan angka')
+    syncRoomInputs()
+    return
+  }
+  const count = countNewlyOutside(w, d)
+  if (count > 0) {
+    const ok = confirm(`${count} furnitur akan berada di luar ruangan dan ditandai merah. Lanjutkan?`)
+    if (!ok) { syncRoomInputs(); return }
+  }
+  setRoomSize(w, d)
+  syncRoomInputs()
+  state.dirty = true
+}
+
 // ---------- Tampilkan hasil analisis di panel ----------
 export function refreshAnalysis() {
   const result = analyze(parseFloat(inWalk.value))
@@ -80,6 +115,8 @@ export function refreshAnalysis() {
 
 // ---------- Pasang semua event (dijalankan sekali saat halaman dibuka) ----------
 export function initUI() {
+  document.getElementById('btn-room').addEventListener('click', applyRoomSize)
+  syncRoomInputs()
   for (const input of [inW, inD, inH]) input.addEventListener('change', applySize)
 
   document.getElementById('btn-rotate').addEventListener('click', () => {

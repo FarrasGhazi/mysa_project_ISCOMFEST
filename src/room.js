@@ -1,6 +1,6 @@
 // room.js — membangun lantai, dinding, dan pintu dari ukuran di config.js.
 import * as THREE from 'three'
-import { scene } from './scene.js'
+import { scene, fitCamera } from './scene.js'
 import { room, door, COLORS } from './config.js'
 
 let parts = [] // semua kotak penyusun ruangan, disimpan supaya bisa dibuang saat dibangun ulang
@@ -32,4 +32,14 @@ export function buildRoom() {
   addBox(wallT, h, d, COLORS.wall, -wallT / 2, h / 2, d / 2)                     // dinding kiri
   addBox(door.w, 2.0, 0.04, 0xf4efe6, door.x, 1.0, 0.02)                         // daun pintu
   addBox(0.06, 0.06, 0.06, 0xd9a441, door.x - door.w / 2 + 0.13, 1.0, 0.07)      // gagang
+}
+
+// Ubah ukuran ruangan (meter). Pintu digeser bila perlu supaya tetap di dinding.
+export function setRoomSize(w, d) {
+  room.w = w
+  room.d = d
+  const margin = 0.1 + door.w / 2
+  door.x = Math.min(Math.max(door.x, margin), w - margin)
+  buildRoom()
+  fitCamera()
 }

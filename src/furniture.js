@@ -153,3 +153,27 @@ export function removeFurniture(group) {
   furniture.splice(furniture.indexOf(group), 1)
   state.dirty = true
 }
+
+// Apakah furnitur melewati dinding pada ruangan berukuran (w, d)? Bagian yang keluar sedikit pun dihitung.
+export function isOutside(obj, w = room.w, d = room.d) {
+  const { hw, hd } = halfSize(obj)
+  const EPS = 0.001
+  const { x, z } = obj.position
+  return x - hw < -EPS || x + hw > w + EPS || z - hd < -EPS || z + hd > d + EPS
+}
+
+// Berapa furnitur yang BARU akan keluar jika ruangan diubah ke (w, d)?
+export function countNewlyOutside(w, d) {
+  return furniture.filter((f) => !isOutside(f) && isOutside(f, w, d)).length
+}
+
+// Beri warna merah pada furnitur yang berada di luar ruangan (dipanggil tiap tata letak berubah)
+export function refreshOutside() {
+  for (const f of furniture) {
+    const out = isOutside(f)
+    for (const mesh of f.children) {
+      mesh.material.emissive.set(out ? 0xff2020 : 0x000000)
+      mesh.material.emissiveIntensity = out ? 0.8 : 1
+    }
+  }
+}
