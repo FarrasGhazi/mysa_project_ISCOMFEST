@@ -23,6 +23,9 @@ const notesEl = document.getElementById('notes')
 const toastEl = document.getElementById('toast')
 const swatchBox = document.getElementById('swatches')
 const inColor = document.getElementById('in-color')
+const chkLock = document.getElementById('chk-lock')
+const btnRotate = document.getElementById('btn-rotate')
+const btnDelete = document.getElementById('btn-delete')
 
 // ---------- Pesan singkat di bawah layar ----------
 let toastTimer
@@ -47,6 +50,12 @@ function setColor(hex) {
   state.dirty = true
 }
 
+// Furnitur terkunci: kolom ukuran, tombol putar, dan tombol hapus dinonaktifkan
+function refreshLockUI() {
+  const locked = !!state.selected && !!state.selected.userData.locked
+  for (const el of [inW, inD, inH, btnRotate, btnDelete]) el.disabled = locked
+}
+
 // ---------- Pilih furnitur dan isi panel edit ----------
 export function select(obj) {
   state.selected = obj
@@ -58,6 +67,8 @@ export function select(obj) {
   inD.value = Math.round(d * 100)
   inH.value = Math.round(h * 100)
   inColor.value = toCss(mainColor(obj))
+  chkLock.checked = !!obj.userData.locked
+  refreshLockUI()
 }
 
 function readSize(input, min, max, fallback) {
@@ -219,4 +230,11 @@ export function initUI() {
 
   // Export PNG
   document.getElementById('btn-export').addEventListener('click', exportPng)
+
+  // Lock Furniture
+  chkLock.addEventListener('change', () => {
+    if (!state.selected) return
+    state.selected.userData.locked = chkLock.checked
+    refreshLockUI()
+  })
 }

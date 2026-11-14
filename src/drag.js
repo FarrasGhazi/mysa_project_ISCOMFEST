@@ -20,6 +20,13 @@ function setPointer(event) {
   raycaster.setFromCamera(pointer, camera)
 }
 
+// Naik dari kotak yang terkena sinar sampai ke group furniturnya
+function ownerOf(object) {
+  let obj = object
+  while (obj.parent && !furniture.includes(obj)) obj = obj.parent
+  return obj
+}
+
 export function initDrag() {
   const canvas = renderer.domElement
 
@@ -27,9 +34,9 @@ export function initDrag() {
     setPointer(event)
     const hits = raycaster.intersectObjects(furniture, true)
     if (hits.length === 0) { select(null); return }
-    let obj = hits[0].object
-    while (obj.parent && !furniture.includes(obj)) obj = obj.parent
+    const obj = ownerOf(hits[0].object)
     select(obj)
+    if (obj.userData.locked) return // terkunci: boleh dipilih, tidak boleh digeser
     dragging = obj
     raycaster.ray.intersectPlane(floorPlane, hitPoint)
     grabOffset.set(obj.position.x - hitPoint.x, 0, obj.position.z - hitPoint.z)
@@ -40,8 +47,9 @@ export function initDrag() {
   canvas.addEventListener('pointermove', (event) => {
     setPointer(event)
     if (!dragging) {
-      canvas.style.cursor =
-        raycaster.intersectObjects(furniture, true).length > 0 ? 'grab' : 'default'
+      const hits = raycaster.intersectObjects(furniture, true)
+      if (hits.length === 0) canvas.style.cursor = 'default'
+      else canvas.style.cursor = ownerOf(hits[0].object).userData.locked ? 'not-allowed' : 'grab'
       return
     }
     if (!raycaster.ray.intersectPlane(floorPlane, hitPoint)) return

@@ -15,6 +15,7 @@ export function updateMarker() {
   if (!sel) { marker.visible = false; return }
   const { w, d } = sel.userData
   marker.visible = true
+  marker.material.color.set(sel.userData.locked ? 0xffc107 : 0xffffff) // kuning = terkunci
   marker.position.set(sel.position.x, 0.007, sel.position.z)
   marker.rotation.y = sel.rotation.y
   marker.scale.set(w + 0.1, 1, d + 0.1)
