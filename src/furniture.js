@@ -1,7 +1,7 @@
 // furniture.js — aturan furnitur: bentuk, tambah/hapus, batas dinding, tabrakan.
 import * as THREE from 'three'
 import { scene } from './scene.js'
-import { room, SNAP, CATALOG, doorZone, grid } from './config.js'
+import { room, SNAP, CATALOG, doorSwing, grid } from './config.js'
 import { state } from './state.js'
 
 export const furniture = [] // semua furnitur yang ada di ruangan
@@ -74,7 +74,7 @@ export function collides(obj, x, z) {
   const EPS = 0.001
   const overlap = (r) =>
     Math.abs(x - r.x) < hw + r.hw - EPS && Math.abs(z - r.z) < hd + r.hd - EPS
-  if (overlap(doorZone())) return true
+  
   for (const other of furniture) {
     if (other === obj) continue
     const s = halfSize(other)
@@ -83,16 +83,24 @@ export function collides(obj, x, z) {
   return false
 }
 
-// Apakah ada furnitur di dalam area ayun pintu (dengan pengaturan pintu saat ini)?
-export function doorZoneHasFurniture() {
-  const z = doorZone()
-  return furniture.some((item) => {
-    const s = halfSize(item)
-    return (
-      Math.abs(item.position.x - z.x) < s.hw + z.hw - 0.001 &&
-      Math.abs(item.position.z - z.z) < s.hd + z.hd - 0.001
-    )
-  })
+// Selisih posisi sepanjang satu sumbu, diukur dari engsel dan dikalikan arah (+1 atau -1).
+// Mengembalikan [terkecil, terbesar] untuk sisi persegi furnitur.
+function span(center, half, origin, sign) {
+  const a = sign * (center - half - origin)
+  const b = sign * (center + half - origin)
+  return [Math.min(a, b), Math.max(a, b)]
+}
+
+// Apakah obj di posisi (x, z) menyentuh juring ayun pintu?
+export function touchesDoorSwing(obj, x, z) {
+  const s = doorSwing()
+  const { hw, hd } = halfSize(obj)
+  // Ubah persegi furnitur ke kerangka pintu: a = searah daun pintu, n = ke dalam ruangan
+  const [a0, a1] = s.ax !== 0 ? span(x, hw, s.hx, s.ax) : span(z, hd, s.hz, s.az)
+  const [n0, n1] = s.nx !== 0 ? span(x, hw, s.hx, s.nx) : span(z, hd, s.hz, s.nz)
+  if (a1 <= 0 || n1 <= 0) return false // seluruhnya di luar kuadran yang disapu
+  // Titik persegi yang paling dekat dengan engsel; menyentuh jika masih di dalam jari-jari
+  return Math.hypot(Math.max(a0, 0), Math.max(n0, 0)) < s.r - 0.001
 }
 
 // Cari tempat kosong terdekat dari tengah ruangan
@@ -102,7 +110,7 @@ function findFreeSpot(obj) {
   let bestDist = Infinity
   for (let x = hw; x <= room.w - hw + 1e-6; x += SNAP) {
     for (let z = hd; z <= room.d - hd + 1e-6; z += SNAP) {
-      if (collides(obj, x, z)) continue
+      if (collides(obj, x, z) || touchesDoorSwing(obj, x, z)) continue // penempatan awal menghindari area pintu
       const dist = Math.hypot(x - room.w / 2, z - room.d / 2)
       if (dist < bestDist) { bestDist = dist; best = { x, z } }
     }

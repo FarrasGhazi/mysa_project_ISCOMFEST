@@ -1,7 +1,7 @@
 // floormode.js — mode lantai: hijau = kosong, merah = tertutup furnitur, biru = area ayun pintu.
 import * as THREE from 'three'
 import { scene } from './scene.js'
-import { room, doorZone } from './config.js'
+import { room, doorSwing } from './config.js'
 import { furniture, halfSize } from './furniture.js'
 
 const PX = 100 // resolusi gambar lantai: 1 piksel = 1 cm
@@ -65,6 +65,21 @@ function applyFurnitureVisibility() {
   for (const item of furniture) item.visible = !hide
 }
 
+// Gambar juring ayun pintu (biru) di kanvas lantai
+function drawSwing(ctx, s) {
+  const cx = s.hx * PX
+  const cy = s.hz * PX
+  const from = Math.atan2(s.az, s.ax)               // sudut arah daun pintu
+  const to = Math.atan2(s.nz, s.nx)                 // sudut arah ke dalam ruangan
+  const anticlockwise = s.ax * s.nz - s.az * s.nx < 0 // pilih busur 90° yang pendek
+  ctx.beginPath()
+  ctx.moveTo(cx, cy)
+  ctx.arc(cx, cy, s.r * PX, from, to, anticlockwise)
+  ctx.closePath()
+  ctx.fillStyle = 'rgba(90, 150, 255, 0.6)'
+  ctx.fill()
+}
+
 // Gambar ulang mode lantai. Dipanggil saat tata letak berubah.
 export function refreshFloorMode() {
   if (!visible) return
@@ -77,10 +92,8 @@ export function refreshFloorMode() {
   ctx.fillStyle = 'rgba(70, 200, 110, 0.5)'
   ctx.fillRect(0, 0, f.pw, f.ph)
 
-  // 2. area ayun pintu biru (sumbu Y gambar = sumbu Z ruangan)
-  const zone = doorZone()
-  ctx.fillStyle = 'rgba(90, 150, 255, 0.6)'
-  ctx.fillRect((zone.x - zone.hw) * PX, (zone.z - zone.hd) * PX, zone.hw * 2 * PX, zone.hd * 2 * PX)
+  // 2. area ayun pintu: juring biru
+  drawSwing(ctx, doorSwing())
 
   // 3. jejak furnitur: kosongkan hijaunya, lalu tempel bidang merah
   clearRed()

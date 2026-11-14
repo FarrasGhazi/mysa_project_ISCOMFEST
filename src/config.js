@@ -6,8 +6,8 @@ export const room = { w: 3, d: 3, h: 2.5, wallT: 0.12 }
 
 // Pintu. wall = dinding tempatnya: 'z0' belakang, 'z1' depan, 'x0' kiri, 'x1' kanan
 // (sama dengan nama dinding di room.js). pos = posisi pusat pintu sepanjang dinding (meter),
-// w = lebar pintu, swing = kedalaman ruang ayun ke dalam ruangan.
-export const door = { wall: 'z0', pos: 2.35, w: 0.9, swing: 0.9 }
+// w = lebar pintu, hinge = engsel di ujung dinding berkoordinat kecil ('low') atau besar ('high'); gagang di ujung lawannya.)
+export const door = { wall: 'z0', pos: 2.35, w: 0.9, hinge: 'high' }
 
 // Panjang dinding yang ditempati pintu (dinding z0/z1 sepanjang lebar ruangan, x0/x1 sepanjang panjangnya)
 export function doorWallLength() {
@@ -20,17 +20,17 @@ export function doorRange() {
   return { lo, hi: doorWallLength() - lo }
 }
 
-// Area ayun pintu: persegi di depan pintu yang tidak boleh ditempati furnitur.
-// Bentuk (x, z, hw, hd) = pusat dan setengah-ukuran, sama seperti furnitur.
-export function doorZone() {
-  const hw = door.w / 2
-  const hd = door.swing / 2
-  switch (door.wall) {
-    case 'z0': return { x: door.pos, z: hd, hw, hd }
-    case 'z1': return { x: door.pos, z: room.d - hd, hw, hd }
-    case 'x0': return { x: hd, z: door.pos, hw: hd, hd: hw }
-    default:   return { x: room.w - hd, z: door.pos, hw: hd, hd: hw } // 'x1'
-  }
+// Juring ayun pintu: seperempat lingkaran (90°) dengan pusat di engsel dan jari-jari = lebar pintu.
+// (hx, hz) = titik engsel, (ax, az) = arah dari engsel ke ujung bebas pintu (searah dinding),
+// (nx, nz) = arah masuk ke dalam ruangan, r = jari-jari.
+export function doorSwing() {
+  const alongX = door.wall === 'z0' || door.wall === 'z1'
+  const planeAt = { z0: 0, z1: room.d, x0: 0, x1: room.w }[door.wall]
+  const inward = door.wall === 'z0' || door.wall === 'x0' ? 1 : -1
+  const hingeA = door.hinge === 'low' ? door.pos - door.w / 2 : door.pos + door.w / 2
+  const toward = door.hinge === 'low' ? 1 : -1
+  if (alongX) return { hx: hingeA, hz: planeAt, ax: toward, az: 0, nx: 0, nz: inward, r: door.w }
+  return { hx: planeAt, hz: hingeA, ax: 0, az: toward, nx: inward, nz: 0, r: door.w }
 }
 
 export const SNAP = 0.05 // kelipatan posisi saat menggeser furnitur

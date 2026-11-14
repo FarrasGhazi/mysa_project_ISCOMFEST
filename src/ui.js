@@ -1,7 +1,7 @@
 // ui.js — panel HTML: tombol, kolom input, dan tampilan hasil analisis.
 import { CATALOG, room, door, doorRange, PALETTE } from './config.js'
 import { state } from './state.js'
-import { addFurniture, removeFurniture, rebuild, clampXZ, collides, countNewlyOutside, mainColor, doorZoneHasFurniture } from './furniture.js'
+import { addFurniture, removeFurniture, rebuild, clampXZ, collides, countNewlyOutside, mainColor } from './furniture.js'
 import { setRoomSize, buildRoom } from './room.js'
 import { setGridStep, setGridVisible } from "./grid.js";
 import { setFloorModeVisible, setHideFurniture } from "./floormode.js";
@@ -136,7 +136,7 @@ const selDoorWall = document.getElementById('door-wall')
 const inDoorPos = document.getElementById('door-pos')
 const lblDoorPos = document.getElementById('door-pos-val')
 const inDoorW = document.getElementById('door-w')
-const inDoorSwing = document.getElementById('door-swing')
+const btnHinge = document.getElementById('btn-hinge')
 
 const cm = (m) => Math.round(m * 100)
 
@@ -149,7 +149,6 @@ function syncDoorInputs() {
   inDoorPos.value = cm(door.pos)
   lblDoorPos.textContent = cm(door.pos)
   inDoorW.value = cm(door.w)
-  inDoorSwing.value = cm(door.swing)
 }
 
 // Baca kolom angka (cm), batasi ke rentang, bulatkan ke 5 cm, ubah ke meter
@@ -159,23 +158,16 @@ function readDoorCm(input, min, max) {
   return (Math.round(Math.min(Math.max(v, min), max) / 5) * 5) / 100
 }
 
-// Terapkan pengaturan pintu dari kontrol. Dibatalkan bila area ayunnya menabrak furnitur.
+// Terapkan pengaturan pintu dari kontrol
 function applyDoor() {
-  const old = { ...door }
   const w = readDoorCm(inDoorW, 60, 120)
-  const swing = readDoorCm(inDoorSwing, 20, 120)
-  if (w === null || swing === null) { syncDoorInputs(); return }
+  if (w === null) { syncDoorInputs(); return }
 
   door.wall = selDoorWall.value
   door.w = w
-  door.swing = swing
   const { lo, hi } = doorRange()
   door.pos = Math.min(Math.max(parseFloat(inDoorPos.value) / 100, lo), hi)
 
-  if (doorZoneHasFurniture()) {
-    Object.assign(door, old) // batalkan
-    toast('Ada furnitur di area ayun pintu itu. Pindahkan furnitur dulu')
-  }
   syncDoorInputs()
   buildRoom()
   state.dirty = true
@@ -188,7 +180,13 @@ export function initUI() {
   syncDoorInputs()
   selDoorWall.addEventListener('change', applyDoor)
   inDoorW.addEventListener('change', applyDoor)
-  inDoorSwing.addEventListener('change', applyDoor)
+
+  btnHinge.addEventListener('click', () => {
+    door.hinge = door.hinge === 'high' ? 'low' : 'high'
+    buildRoom()
+    state.dirty = true
+  })
+
   inDoorPos.addEventListener('input', applyDoor) // slider: bereaksi saat digeser
 
   const selGrid = document.getElementById('sel-grid')

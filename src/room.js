@@ -28,8 +28,9 @@ function addDoor() {
   const inward = door.wall === 'z0' || door.wall === 'x0' ? 1 : -1     // arah ke dalam ruangan
   const leafN = planeAt + inward * 0.02   // pusat daun pintu (tebal 0.04)
   const knobN = planeAt + inward * 0.07   // pusat gagang
-  const knobA = door.pos - door.w / 2 + 0.13 // gagang di dekat salah satu tepi pintu
-
+  // gagang di ujung pintu yang berlawanan dengan engsel
+  const knobA = door.hinge === 'high' ? door.pos - door.w / 2 + 0.13 : door.pos + door.w / 2 - 0.13
+  
   if (alongX) {
     return [
       addBox(door.w, 2.0, 0.04, 0xf4efe6, door.pos, 1.0, leafN),
