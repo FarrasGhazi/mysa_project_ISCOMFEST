@@ -13,7 +13,7 @@ function getParts(type, w, d, h) {
     const mh = h * 0.5
     return [
       { w, h: fh, d, x: 0, y: fh / 2, z: 0, color: 0x6b4a32 },
-      { w: w - 0.06, h: mh, d: d - 0.06, x: 0, y: fh + mh / 2, z: 0, color: 0xf2ead8 },
+      { w: w - 0.06, h: mh, d: d - 0.06, x: 0, y: fh + mh / 2, z: 0, main: true, color: 0xf2ead8 },
       { w: Math.max(w - 0.3, 0.2), h: 0.1, d: 0.35, x: 0, y: fh + mh + 0.05,
         z: -d / 2 + 0.3, color: 0xffffff },
     ]
@@ -22,7 +22,7 @@ function getParts(type, w, d, h) {
     const t = 0.04, leg = 0.05, lh = h - t
     const ix = w / 2 - leg / 2 - 0.02
     const iz = d / 2 - leg / 2 - 0.02
-    const parts = [{ w, h: t, d, x: 0, y: h - t / 2, z: 0, color: 0xd9b382 }]
+    const parts = [{ w, h: t, d, x: 0, y: h - t / 2, z: 0, color: 0xd9b382, main: true }]
     for (const sx of [-1, 1]) {
       for (const sz of [-1, 1]) {
         parts.push({ w: leg, h: lh, d: leg, x: sx * ix, y: lh / 2, z: sz * iz, color: 0x5a4030 })
@@ -33,7 +33,7 @@ function getParts(type, w, d, h) {
   if (type === 'wardrobe') {
     return [
       { w, h, d, x: 0, y: h / 2, z: 0, color: 0xefe6d2 },
-      { w: 0.02, h: h * 0.92, d: 0.01, x: 0, y: h / 2, z: d / 2 + 0.005, color: 0x8a7a62 },
+      { w: 0.02, h: h * 0.92, d: 0.01, x: 0, y: h / 2, z: d / 2 + 0.005, main: true, color: 0x8a7a62 },
     ]
   }
   // kursi
@@ -41,7 +41,7 @@ function getParts(type, w, d, h) {
   const ix = w / 2 - leg / 2
   const iz = d / 2 - leg / 2
   const parts = [
-    { w, h: t, d, x: 0, y: seatY - t / 2, z: 0, color: 0xc9a06c },
+    { w, h: t, d, x: 0, y: seatY - t / 2, z: 0, main: true,  color: 0xc9a06c },
     { w, h: h - seatY, d: 0.05, x: 0, y: seatY + (h - seatY) / 2, z: -d / 2 + 0.025, color: 0xc9a06c },
   ]
   for (const sx of [-1, 1]) {
@@ -111,9 +111,11 @@ export function rebuild(group) {
   const { type, w, d, h } = group.userData
   disposeChildren(group)
   for (const p of getParts(type, w, d, h)) {
+    // bagian utama memakai warna pilihan pengguna (kalau ada), selainnya warna bawaan resep
+    const color = p.main && group.userData.color != null ? group.userData.color : p.color
     const mesh = new THREE.Mesh(
       new THREE.BoxGeometry(p.w, p.h, p.d),
-      new THREE.MeshStandardMaterial({ color: p.color })
+      new THREE.MeshStandardMaterial({ color })
     )
     mesh.position.set(p.x, p.y, p.z)
     mesh.castShadow = true
@@ -186,4 +188,11 @@ export function snapToGrid(obj, x, z) {
     x: Math.round((x - hw) / s) * s + hw,
     z: Math.round((z - hd) / s) * s + hd,
   }
+}
+
+// Warna bagian utama furnitur saat ini (pilihan pengguna, atau warna bawaan resep)
+export function mainColor(obj) {
+  const { type, w, d, h, color } = obj.userData
+  if (color != null) return color
+  return getParts(type, w, d, h).find((p) => p.main).color
 }

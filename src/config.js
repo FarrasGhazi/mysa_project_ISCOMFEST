@@ -37,3 +37,15 @@ export function viewSigns() {
   const [sx, sz] = SIGNS[view.index]
   return { sx, sz }
 }
+
+// Warna cepat untuk furnitur (tanpa merah, karena merah dipakai sebagai penanda "di luar ruangan")
+export const PALETTE = [
+  0xefe6d2, // krem
+  0xffffff, // putih
+  0xd9b382, // kayu muda
+  0x8b5e3c, // cokelat
+  0x3b3b3b, // hitam
+  0x6aa7d8, // biru
+  0x7fb77e, // hijau
+  0xf2c14e, // kuning
+]

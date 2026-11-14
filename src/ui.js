@@ -1,7 +1,7 @@
 // ui.js — panel HTML: tombol, kolom input, dan tampilan hasil analisis.
-import { CATALOG, room } from './config.js'
+import { CATALOG, room, PALETTE } from './config.js'
 import { state } from './state.js'
-import { addFurniture, removeFurniture, rebuild, clampXZ, collides, countNewlyOutside } from './furniture.js'
+import { addFurniture, removeFurniture, rebuild, clampXZ, collides, countNewlyOutside, mainColor } from './furniture.js'
 import { analyze, setHeatVisible } from './analysis.js'
 import { setRoomSize } from './room.js'
 import { setGridStep, setGridVisible } from "./grid.js";
@@ -20,6 +20,8 @@ const verdictEl = document.getElementById('verdict')
 const scoreEl = document.getElementById('score')
 const notesEl = document.getElementById('notes')
 const toastEl = document.getElementById('toast')
+const swatchBox = document.getElementById('swatches')
+const inColor = document.getElementById('in-color')
 
 // ---------- Pesan singkat di bawah layar ----------
 let toastTimer
@@ -28,6 +30,20 @@ export function toast(message) {
   toastEl.classList.add('show')
   clearTimeout(toastTimer)
   toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200)
+}
+
+// Angka warna (0xRRGGBB) jadi teks "#rrggbb"
+function toCss(hex) {
+  return '#' + hex.toString(16).padStart(6, '0')
+}
+
+// Ganti warna bagian utama furnitur terpilih. hex = null berarti kembali ke warna bawaan.
+function setColor(hex) {
+  const sel = state.selected
+  if (!sel) return
+  sel.userData.color = hex
+  rebuild(sel)
+  state.dirty = true
 }
 
 // ---------- Pilih furnitur dan isi panel edit ----------
@@ -40,6 +56,7 @@ export function select(obj) {
   inW.value = Math.round(w * 100)
   inD.value = Math.round(d * 100)
   inH.value = Math.round(h * 100)
+  inColor.value = toCss(mainColor(obj))
 }
 
 function readSize(input, min, max, fallback) {
@@ -148,10 +165,22 @@ export function initUI() {
     btnLeft.disabled = chkTop.checked // putar sudut hanya untuk tampilan isometrik
     btnRight.disabled = chkTop.checked
   })
+  
   // sinkronkan saat halaman dibuka (browser kadang mengingat centangnya)
   btnLeft.disabled = btnRight.disabled = chkTop.checked
   setTopView(chkTop.checked)
   
+  for (const hex of PALETTE) {
+    const swatch = document.createElement('button')
+    swatch.className = 'swatch'
+    swatch.style.background = toCss(hex)
+    swatch.title = toCss(hex)
+    swatch.addEventListener('click', () => setColor(hex))
+    swatchBox.appendChild(swatch)
+  }
+  inColor.addEventListener('input', () => setColor(parseInt(inColor.value.slice(1), 16)))
+  document.getElementById('btn-color-reset').addEventListener('click', () => setColor(null))
+
   for (const input of [inW, inD, inH]) input.addEventListener('change', applySize)
 
   document.getElementById('btn-rotate').addEventListener('click', () => {

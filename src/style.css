@@ -69,3 +69,7 @@ canvas { display: block; touch-action: none; }
 .dot.blue { background: #5a96ff; }
 
 #panel button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+#swatches { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+#panel button.swatch { width: 26px; height: 26px; padding: 0; border: 2px solid #ddd; border-radius: 50%; }
+#panel input[type="color"] { padding: 2px; height: 34px; }
