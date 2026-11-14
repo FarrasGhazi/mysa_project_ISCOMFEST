@@ -1,96 +1,126 @@
 <!doctype html>
 <html lang="id">
-
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KosPlanner</title>
   </head>
-
   <body>
     <div id="app"></div>
-        <div id="app"></div>
 
-    <aside id="panel">
-      <h1>KosPlanner</h1>
+    <!-- Bilah ikon di kiri -->
+    <nav id="rail" aria-label="Menu">
+      <div class="brand" title="KosPlanner">KP</div>
 
-      <button id="btn-export" class="wide">Simpan sebagai PNG</button>
-      
-      <h2>Ukuran ruangan</h2>
-      <div class="row2">
-        <label>Lebar (cm) <input id="room-w" type="number" min="150" max="600" step="5" value="300" /></label>
-        <label>Panjang (cm) <input id="room-d" type="number" min="150" max="600" step="5" value="300" /></label>
-      </div>
-      <button id="btn-room" class="wide">Terapkan ukuran</button>
+      <button class="rail-btn active" data-panel="catalog" title="Katalog furnitur">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="6" width="14" height="6" rx="2"/><rect x="2" y="11" width="20" height="6" rx="2"/><path d="M5 17v3M19 17v3"/></svg>
+        <span>Furnitur</span>
+      </button>
+      <button class="rail-btn" data-panel="room" title="Ukuran ruangan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>
+        <span>Ruangan</span>
+      </button>
+      <button class="rail-btn" data-panel="view" title="Pengaturan tampilan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span>Tampilan</span>
+      </button>
 
-      <h2>Grid</h2>
-      <label>Satuan grid
-        <select id="sel-grid">
-          <option value="10" selected>10 cm</option>
-          <option value="25">25 cm</option>
-          <option value="50">50 cm</option>
-        </select>
-      </label>
-      <label class="check"><input id="chk-grid" type="checkbox" checked /> Tampilkan grid</label>
-      <p class="hint">Furnitur menempel ke garis grid. Garis tebal = 1 m, sedang = 50 cm.</p>
+      <div class="rail-spacer"></div>
 
-      <h2>Kamera</h2>
-      <div class="row">
-        <button id="btn-view-left">&#9664; Putar</button>
-        <button id="btn-view-right">Putar &#9654;</button>
-      </div>
-      <label class="check"><input id="chk-top" type="checkbox" /> Tampilan atas</label>
+      <button class="rail-btn" id="btn-export" title="Simpan sebagai PNG">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg>
+        <span>Simpan</span>
+      </button>
+    </nav>
 
-      <h2>Mode lantai</h2>
-      <label class="check"><input id="chk-floor" type="checkbox" /> Tampilkan lantai terpakai / kosong</label>
-      <label class="check"><input id="chk-hide" type="checkbox" disabled /> Sembunyikan furnitur (hanya warna)</label>
-      <p class="hint"><span class="dot red"></span>terpakai <span class="dot green"></span>kosong <span class="dot blue"></span>area ayun pintu</p>
-      
-      <h2>Tambah furnitur</h2>
-      <div id="catalog">
-        <button data-type="bed">Kasur</button>
-        <button data-type="desk">Meja belajar</button>
-        <button data-type="wardrobe">Lemari</button>
-        <button data-type="chair">Kursi</button>
-      </div>
-
-      <div id="edit" hidden>
-        <h2 id="sel-name">Furnitur</h2>
-        <label class="check"><input id="chk-lock" type="checkbox" /> Kunci posisi dan ukuran</label>
-        <label>Lebar (cm) <input id="in-w" type="number" min="30" max="300" step="5" /></label>
-        <label>Dalam (cm) <input id="in-d" type="number" min="30" max="300" step="5" /></label>
-        <label>Tinggi (cm) <input id="in-h" type="number" min="10" max="300" step="5" /></label>
-        <h2>Warna</h2>
-        <div id="swatches"></div>
-        <label>Warna lain <input id="in-color" type="color" value="#cccccc" /></label>
-        <button id="btn-color-reset" class="wide">Warna bawaan</button>
-        <div class="row">
-          <button id="btn-rotate">Putar 90°</button>
-          <button id="btn-delete" class="danger">Hapus</button>
+    <!-- Panel yang terbuka sesuai ikon terpilih -->
+    <aside id="drawer">
+      <section class="drawer-section" id="panel-catalog">
+        <h2>Tambah furnitur</h2>
+        <div id="catalog">
+          <button data-type="bed">Kasur</button>
+          <button data-type="desk">Meja belajar</button>
+          <button data-type="wardrobe">Lemari</button>
+          <button data-type="chair">Kursi</button>
         </div>
+        <p class="hint">Klik furnitur di ruangan untuk mengubah ukuran, warna, dan posisinya.</p>
+      </section>
+
+      <section class="drawer-section" id="panel-room" hidden>
+        <h2>Ukuran ruangan</h2>
+        <div class="row3">
+          <label>Lebar (cm) <input id="room-w" type="number" min="150" max="600" step="5" value="300" /></label>
+          <label>Panjang (cm) <input id="room-d" type="number" min="150" max="600" step="5" value="300" /></label>
+        </div>
+        <button id="btn-room" class="wide">Terapkan ukuran</button>
+        <p class="hint">Lebar mengikuti dinding belakang (yang ada pintunya), panjang mengikuti dinding kiri. Rentang 150 sampai 600 cm.</p>
+      </section>
+
+      <section class="drawer-section" id="panel-view" hidden>
+        <h2>Kamera</h2>
+        <div class="row">
+          <button id="btn-view-left">&#9664; Putar</button>
+          <button id="btn-view-right">Putar &#9654;</button>
+        </div>
+        <label class="check"><input id="chk-top" type="checkbox" /> Tampilan atas</label>
+
+        <h2>Grid</h2>
+        <label>Satuan grid
+          <select id="sel-grid">
+            <option value="10" selected>10 cm</option>
+            <option value="25">25 cm</option>
+            <option value="50">50 cm</option>
+          </select>
+        </label>
+        <label class="check"><input id="chk-grid" type="checkbox" checked /> Tampilkan grid</label>
+        <p class="hint">Furnitur menempel ke garis grid. Garis tebal = 1 m, sedang = 50 cm.</p>
+
+        <h2>Mode lantai</h2>
+        <label class="check"><input id="chk-floor" type="checkbox" /> Tampilkan lantai terpakai / kosong</label>
+        <label class="check"><input id="chk-hide" type="checkbox" disabled /> Sembunyikan furnitur (hanya warna)</label>
+        <p class="hint"><span class="dot red"></span>terpakai <span class="dot green"></span>kosong <span class="dot blue"></span>area ayun pintu</p>
+
+        <h2>Jalur gerak</h2>
+        <label>Lebar jalur minimum (cm)
+          <input id="in-walk" type="number" min="40" max="80" step="5" value="60" />
+        </label>
+        <label class="check"><input id="chk-heat" type="checkbox" /> Tampilkan peta jalur</label>
+      </section>
+    </aside>
+
+    <!-- Kartu properti: muncul saat furnitur dipilih -->
+    <aside id="edit" hidden>
+      <h2 id="sel-name">Furnitur</h2>
+      <label class="check"><input id="chk-lock" type="checkbox" /> Kunci posisi dan ukuran</label>
+
+      <h2>Ukuran (cm)</h2>
+      <div class="row3">
+        <label>Lebar <input id="in-w" type="number" min="30" max="300" step="5" /></label>
+        <label>Dalam <input id="in-d" type="number" min="30" max="300" step="5" /></label>
+        <label>Tinggi <input id="in-h" type="number" min="10" max="300" step="5" /></label>
       </div>
 
-      <h2>Jalur gerak</h2>
+      <h2>Warna</h2>
+      <div id="swatches"></div>
+      <label>Warna lain <input id="in-color" type="color" value="#cccccc" /></label>
+      <button id="btn-color-reset" class="wide">Warna bawaan</button>
 
-      <label>Lebar jalur minimum (cm)
-        <input id="in-walk" type="number" min="40" max="80" step="5" value="60" />
-      </label>
-
-      <label class="check"><input id="chk-heat" type="checkbox" /> Tampilkan peta jalur</label>
-
-      <div style="margin-top:8px">
-        <span id="verdict" class="badge">-</span>
-        <div id="score"></div>
-        <ul id="notes"></ul>
+      <div class="row">
+        <button id="btn-rotate">Putar 90°</button>
+        <button id="btn-delete" class="danger">Hapus</button>
       </div>
+    </aside>
 
+    <!-- Kartu status kelegaan ruang -->
+    <aside id="status">
+      <h2>Kelegaan ruang</h2>
+      <span id="verdict" class="badge">-</span>
+      <div id="score"></div>
+      <ul id="notes"></ul>
     </aside>
 
     <div id="toast"></div>
 
     <script type="module" src="/src/main.js"></script>
-    <script type="module" src="/src/main.js"></script>
-    
   </body>
-
 </html>

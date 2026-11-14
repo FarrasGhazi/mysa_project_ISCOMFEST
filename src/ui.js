@@ -237,4 +237,38 @@ export function initUI() {
     state.selected.userData.locked = chkLock.checked
     refreshLockUI()
   })
+
+  // Bilah ikon: klik ikon untuk membuka panelnya, klik lagi untuk menutup
+  const railButtons = document.querySelectorAll('.rail-btn[data-panel]')
+  const drawer = document.getElementById('drawer')
+  let openPanel = null
+
+  function showPanel(name) {
+    openPanel = name
+    drawer.hidden = name === null
+    for (const section of document.querySelectorAll('.drawer-section')) {
+      section.hidden = section.id !== `panel-${name}`
+    }
+    for (const button of railButtons) {
+      button.classList.toggle('active', button.dataset.panel === name)
+    }
+  }
+
+  for (const button of railButtons) {
+    button.addEventListener('click', () => {
+      showPanel(openPanel === button.dataset.panel ? null : button.dataset.panel)
+    })
+  }
+  
+  const isPhone = () => window.matchMedia('(max-width: 700px)').matches
+
+  // Di HP panel tertutup saat awal, supaya ruangan langsung terlihat
+  showPanel(isPhone() ? null : 'catalog')
+
+  // Di HP, panel menutup sendiri setelah memilih furnitur
+  for (const button of document.querySelectorAll('#catalog button')) {
+    button.addEventListener('click', () => {
+      if (isPhone()) showPanel(null)
+    })
+  }
 }

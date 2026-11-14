@@ -55,15 +55,26 @@ export function fitCamera() {
     viewSize = Math.max(room.w, room.d) * 2
   }
 
+  // Di HP: zoom out dan geser ruangan ke atas, supaya tidak tertutup panel di bawah
+  const phone = window.innerWidth <= 700
+  if (phone) viewSize *= 1.35
+  const shift = phone ? -viewSize * 0.14 : 0
+
   camera.left = (-viewSize * aspect) / 2
   camera.right = (viewSize * aspect) / 2
-  camera.top = viewSize / 2
-  camera.bottom = -viewSize / 2
+  camera.top = viewSize / 2 + shift
+  camera.bottom = -viewSize / 2 + shift
   camera.updateProjectionMatrix()
-
+  
   // Cahaya berada di sisi kamera supaya sisi yang terlihat selalu terang
   sun.target.position.set(room.w / 2, 0, room.d / 2)
   sun.position.set(room.w / 2 + sx * 6, 10, room.d / 2 + sz * 4)
 }
 
 fitCamera()
+
+// Saat ukuran jendela berubah (putar HP, ubah ukuran browser), sesuaikan kanvas dan kamera
+window.addEventListener('resize', () => {
+  renderer.setSize(window.innerWidth, window.innerHeight)
+  fitCamera()
+})
