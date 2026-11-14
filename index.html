@@ -46,36 +46,34 @@
         <p class="hint">Klik furnitur di ruangan untuk mengubah ukuran, warna, dan posisinya.</p>
       </section>
 
-      <section class="drawer-section" id="panel-room" hidden>
+        <section class="drawer-section" id="panel-room" hidden>
         <h2>Ukuran ruangan</h2>
         <div class="row3">
           <label>Lebar (cm) <input id="room-w" type="number" min="150" max="600" step="5" value="300" /></label>
           <label>Panjang (cm) <input id="room-d" type="number" min="150" max="600" step="5" value="300" /></label>
         </div>
         <button id="btn-room" class="wide">Terapkan ukuran</button>
-        
-        <p class="hint">Lebar mengikuti dinding belakang dan depan, panjang mengikuti dinding kiri dan kanan. Rentang 150 sampai 600 cm</p>
+        <p class="hint">Lebar = dinding belakang dan depan, panjang = dinding kiri dan kanan (150 sampai 600 cm).</p>
 
         <h2>Pintu</h2>
-        <label>Dinding
-          <select id="door-wall">
-            <option value="z0" selected>Belakang</option>
-            <option value="x0">Kiri</option>
-            <option value="z1">Depan</option>
-            <option value="x1">Kanan</option>
-          </select>
-        </label>
+        <div class="row3">
+          <label>Dinding
+            <select id="door-wall">
+              <option value="z0" selected>Belakang</option>
+              <option value="x0">Kiri</option>
+              <option value="z1">Depan</option>
+              <option value="x1">Kanan</option>
+            </select>
+          </label>
+          <label>Lebar (cm)
+            <input id="door-w" type="number" min="60" max="120" step="5" value="90" />
+          </label>
+        </div>
         <label>Posisi pintu (<span id="door-pos-val"></span> cm)
           <input id="door-pos" type="range" step="5" />
         </label>
-        <div class="row3">
-        <label>Lebar pintu (cm)
-          <input id="door-w" type="number" min="60" max="120" step="5" value="90" />
-        </label>
         <button id="btn-hinge" class="wide">Balik sisi engsel</button>
-        <p class="hint">Area biru = sapuan daun pintu 90°. Hindari menaruh furnitur di sana supaya pintu bisa dibuka penuh. Gagang ada di sisi yang berlawanan dengan engsel.</p>        
-        </div>
-        <p class="hint">Posisi diukur dari sudut kiri (dinding belakang atau depan) atau sudut belakang (dinding kiri atau kanan). Ayun = kedalaman area biru, bisa dikecilkan bila ada barang di belakang pintu.</p>
+        <p class="hint">Area biru = sapuan pintu 90°. Gagang ada di sisi yang berlawanan dengan engsel.</p>
       </section>
 
       <section class="drawer-section" id="panel-view" hidden>
