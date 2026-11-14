@@ -83,6 +83,18 @@ export function collides(obj, x, z) {
   return false
 }
 
+// Apakah ada furnitur di dalam area ayun pintu (dengan pengaturan pintu saat ini)?
+export function doorZoneHasFurniture() {
+  const z = doorZone()
+  return furniture.some((item) => {
+    const s = halfSize(item)
+    return (
+      Math.abs(item.position.x - z.x) < s.hw + z.hw - 0.001 &&
+      Math.abs(item.position.z - z.z) < s.hd + z.hd - 0.001
+    )
+  })
+}
+
 // Cari tempat kosong terdekat dari tengah ruangan
 function findFreeSpot(obj) {
   const { hw, hd } = halfSize(obj)

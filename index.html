@@ -53,7 +53,26 @@
           <label>Panjang (cm) <input id="room-d" type="number" min="150" max="600" step="5" value="300" /></label>
         </div>
         <button id="btn-room" class="wide">Terapkan ukuran</button>
-        <p class="hint">Lebar mengikuti dinding belakang (yang ada pintunya), panjang mengikuti dinding kiri. Rentang 150 sampai 600 cm.</p>
+        
+        <p class="hint">Lebar mengikuti dinding belakang dan depan, panjang mengikuti dinding kiri dan kanan. Rentang 150 sampai 600 cm</p>
+
+        <h2>Pintu</h2>
+        <label>Dinding
+          <select id="door-wall">
+            <option value="z0" selected>Belakang</option>
+            <option value="x0">Kiri</option>
+            <option value="z1">Depan</option>
+            <option value="x1">Kanan</option>
+          </select>
+        </label>
+        <label>Posisi pintu (<span id="door-pos-val"></span> cm)
+          <input id="door-pos" type="range" step="5" />
+        </label>
+        <div class="row3">
+          <label>Lebar (cm) <input id="door-w" type="number" min="60" max="120" step="5" value="90" /></label>
+          <label>Ayun (cm) <input id="door-swing" type="number" min="20" max="120" step="5" value="90" /></label>
+        </div>
+        <p class="hint">Posisi diukur dari sudut kiri (dinding belakang atau depan) atau sudut belakang (dinding kiri atau kanan). Ayun = kedalaman area biru, bisa dikecilkan bila ada barang di belakang pintu.</p>
       </section>
 
       <section class="drawer-section" id="panel-view" hidden>

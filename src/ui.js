@@ -1,8 +1,8 @@
 // ui.js — panel HTML: tombol, kolom input, dan tampilan hasil analisis.
-import { CATALOG, room, PALETTE } from './config.js'
+import { CATALOG, room, door, doorRange, PALETTE } from './config.js'
 import { state } from './state.js'
-import { addFurniture, removeFurniture, rebuild, clampXZ, collides, countNewlyOutside, mainColor } from './furniture.js'
-import { setRoomSize } from './room.js'
+import { addFurniture, removeFurniture, rebuild, clampXZ, collides, countNewlyOutside, mainColor, doorZoneHasFurniture } from './furniture.js'
+import { setRoomSize, buildRoom } from './room.js'
 import { setGridStep, setGridVisible } from "./grid.js";
 import { setFloorModeVisible, setHideFurniture } from "./floormode.js";
 import { rotateView, setTopView } from "./view.js";
@@ -126,7 +126,58 @@ function applyRoomSize() {
     if (!ok) { syncRoomInputs(); return }
   }
   setRoomSize(w, d)
+  syncDoorInputs() // pintu bisa bergeser saat ruangan mengecil
   syncRoomInputs()
+  state.dirty = true
+}
+
+// ---------- Pintu ----------
+const selDoorWall = document.getElementById('door-wall')
+const inDoorPos = document.getElementById('door-pos')
+const lblDoorPos = document.getElementById('door-pos-val')
+const inDoorW = document.getElementById('door-w')
+const inDoorSwing = document.getElementById('door-swing')
+
+const cm = (m) => Math.round(m * 100)
+
+// Tampilkan data pintu di kontrol. Rentang slider mengikuti panjang dinding dan lebar pintu.
+function syncDoorInputs() {
+  const { lo, hi } = doorRange()
+  selDoorWall.value = door.wall
+  inDoorPos.min = Math.ceil(cm(lo) / 5) * 5
+  inDoorPos.max = Math.floor(cm(hi) / 5) * 5
+  inDoorPos.value = cm(door.pos)
+  lblDoorPos.textContent = cm(door.pos)
+  inDoorW.value = cm(door.w)
+  inDoorSwing.value = cm(door.swing)
+}
+
+// Baca kolom angka (cm), batasi ke rentang, bulatkan ke 5 cm, ubah ke meter
+function readDoorCm(input, min, max) {
+  const v = parseFloat(input.value)
+  if (Number.isNaN(v)) return null
+  return (Math.round(Math.min(Math.max(v, min), max) / 5) * 5) / 100
+}
+
+// Terapkan pengaturan pintu dari kontrol. Dibatalkan bila area ayunnya menabrak furnitur.
+function applyDoor() {
+  const old = { ...door }
+  const w = readDoorCm(inDoorW, 60, 120)
+  const swing = readDoorCm(inDoorSwing, 20, 120)
+  if (w === null || swing === null) { syncDoorInputs(); return }
+
+  door.wall = selDoorWall.value
+  door.w = w
+  door.swing = swing
+  const { lo, hi } = doorRange()
+  door.pos = Math.min(Math.max(parseFloat(inDoorPos.value) / 100, lo), hi)
+
+  if (doorZoneHasFurniture()) {
+    Object.assign(door, old) // batalkan
+    toast('Ada furnitur di area ayun pintu itu. Pindahkan furnitur dulu')
+  }
+  syncDoorInputs()
+  buildRoom()
   state.dirty = true
 }
 
@@ -134,6 +185,11 @@ function applyRoomSize() {
 export function initUI() {
   document.getElementById('btn-room').addEventListener('click', applyRoomSize)
   syncRoomInputs()
+  syncDoorInputs()
+  selDoorWall.addEventListener('change', applyDoor)
+  inDoorW.addEventListener('change', applyDoor)
+  inDoorSwing.addEventListener('change', applyDoor)
+  inDoorPos.addEventListener('input', applyDoor) // slider: bereaksi saat digeser
 
   const selGrid = document.getElementById('sel-grid')
   const chkGrid = document.getElementById('chk-grid')

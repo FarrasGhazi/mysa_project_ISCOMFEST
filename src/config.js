@@ -14,6 +14,12 @@ export function doorWallLength() {
   return door.wall === 'z0' || door.wall === 'z1' ? room.w : room.d
 }
 
+// Rentang posisi pusat pintu sepanjang dinding (meter): menyisakan 10 cm dari tiap sudut
+export function doorRange() {
+  const lo = 0.1 + door.w / 2
+  return { lo, hi: doorWallLength() - lo }
+}
+
 // Area ayun pintu: persegi di depan pintu yang tidak boleh ditempati furnitur.
 // Bentuk (x, z, hw, hd) = pusat dan setengah-ukuran, sama seperti furnitur.
 export function doorZone() {

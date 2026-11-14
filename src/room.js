@@ -1,7 +1,7 @@
 // room.js — membangun lantai, empat dinding, dan pintu dari ukuran di config.js.
 import * as THREE from 'three'
 import { scene, fitCamera } from './scene.js'
-import { room, door, doorWallLength, COLORS, view, viewSigns } from './config.js'
+import { room, door, doorRange, COLORS, view, viewSigns } from './config.js'
 import { buildGrid } from './grid.js'
 
 let parts = []     // semua kotak penyusun ruangan, disimpan supaya bisa dibuang saat dibangun ulang
@@ -82,8 +82,8 @@ export function applyWallVisibility() {
 export function setRoomSize(w, d) {
   room.w = w
   room.d = d
-  const margin = 0.1 + door.w / 2
-  door.pos = Math.min(Math.max(door.pos, margin), doorWallLength() - margin)
+  const { lo, hi } = doorRange()
+  door.pos = Math.min(Math.max(door.pos, lo), hi)
   buildRoom()
   buildGrid()
   fitCamera()
