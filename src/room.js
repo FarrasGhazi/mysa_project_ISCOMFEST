@@ -2,6 +2,7 @@
 import * as THREE from 'three'
 import { scene, fitCamera } from './scene.js'
 import { room, door, COLORS } from './config.js'
+import { buildGrid } from './grid.js';
 
 let parts = [] // semua kotak penyusun ruangan, disimpan supaya bisa dibuang saat dibangun ulang
 
@@ -41,5 +42,6 @@ export function setRoomSize(w, d) {
   const margin = 0.1 + door.w / 2
   door.x = Math.min(Math.max(door.x, margin), w - margin)
   buildRoom()
+  buildGrid()
   fitCamera()
 }

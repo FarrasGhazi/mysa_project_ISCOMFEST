@@ -21,6 +21,22 @@
       </div>
       <button id="btn-room" class="wide">Terapkan ukuran</button>
 
+      <h2>Grid</h2>
+      <label>Satuan grid
+        <select id="sel-grid">
+          <option value="10" selected>10 cm</option>
+          <option value="25">25 cm</option>
+          <option value="50">50 cm</option>
+        </select>
+      </label>
+      <label class="check"><input id="chk-grid" type="checkbox" checked /> Tampilkan grid</label>
+      <p class="hint">Furnitur menempel ke garis grid. Garis tebal = 1 m, sedang = 50 cm.</p>
+
+      <h2>Mode lantai</h2>
+      <label class="check"><input id="chk-floor" type="checkbox" /> Tampilkan lantai terpakai / kosong</label>
+      <label class="check"><input id="chk-hide" type="checkbox" disabled /> Sembunyikan furnitur (hanya warna)</label>
+      <p class="hint"><span class="dot red"></span>terpakai <span class="dot green"></span>kosong <span class="dot blue"></span>area ayun pintu</p>
+      
       <h2>Tambah furnitur</h2>
       <div id="catalog">
         <button data-type="bed">Kasur</button>

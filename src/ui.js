@@ -4,6 +4,8 @@ import { state } from './state.js'
 import { addFurniture, removeFurniture, rebuild, clampXZ, collides, countNewlyOutside } from './furniture.js'
 import { analyze, setHeatVisible } from './analysis.js'
 import { setRoomSize } from './room.js'
+import { setGridStep, setGridVisible } from "./grid.js";
+import { setFloorModeVisible, setHideFurniture } from "./floormode.js";
 
 // ---------- Cari elemen HTML (ID harus sama persis dengan di index.html) ----------
 const editBox = document.getElementById('edit')
@@ -117,6 +119,22 @@ export function refreshAnalysis() {
 export function initUI() {
   document.getElementById('btn-room').addEventListener('click', applyRoomSize)
   syncRoomInputs()
+  const selGrid = document.getElementById('sel-grid')
+  const chkGrid = document.getElementById('chk-grid')
+  selGrid.addEventListener('change', () => setGridStep(parseInt(selGrid.value, 10)))
+  chkGrid.addEventListener('change', () => setGridVisible(chkGrid.checked))
+  const chkFloor = document.getElementById('chk-floor')
+  const chkHide = document.getElementById('chk-hide')
+  chkFloor.addEventListener('change', () => {
+    chkHide.disabled = !chkFloor.checked // opsi sembunyikan hanya aktif saat mode lantai nyala
+    setFloorModeVisible(chkFloor.checked)
+  })
+  chkHide.addEventListener('change', () => setHideFurniture(chkHide.checked))
+  // sinkronkan dengan kotak centang saat halaman dibuka (browser kadang mengingat centangnya)
+  chkHide.disabled = !chkFloor.checked
+  setHideFurniture(chkHide.checked)
+  setFloorModeVisible(chkFloor.checked)
+  
   for (const input of [inW, inD, inH]) input.addEventListener('change', applySize)
 
   document.getElementById('btn-rotate').addEventListener('click', () => {

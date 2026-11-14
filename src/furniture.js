@@ -1,7 +1,7 @@
 // furniture.js — aturan furnitur: bentuk, tambah/hapus, batas dinding, tabrakan.
 import * as THREE from 'three'
 import { scene } from './scene.js'
-import { room, SNAP, CATALOG, doorZone } from './config.js'
+import { room, SNAP, CATALOG, doorZone, grid } from './config.js'
 import { state } from './state.js'
 
 export const furniture = [] // semua furnitur yang ada di ruangan
@@ -175,5 +175,15 @@ export function refreshOutside() {
       mesh.material.emissive.set(out ? 0xff2020 : 0x000000)
       mesh.material.emissiveIntensity = out ? 0.8 : 1
     }
+  }
+}
+
+// Tempelkan sisi kiri-atas furnitur ke garis grid terdekat. (x, z) = posisi pusat yang diinginkan.
+export function snapToGrid(obj, x, z) {
+  const { hw, hd } = halfSize(obj)
+  const s = grid.step
+  return {
+    x: Math.round((x - hw) / s) * s + hw,
+    z: Math.round((z - hd) / s) * s + hd,
   }
 }

@@ -13,6 +13,8 @@ export function doorZone() {
 }
 
 export const SNAP = 0.05 // kelipatan posisi saat menggeser furnitur
+// Pengaturan grid: step (meter) juga menjadi kelipatan snap saat menggeser furnitur
+export const grid = { step: 0.1, visible: true }
 export const CELL = 0.05 // ukuran sel analisis jalur
 
 export const COLORS = { background: 0x5b6770, floor: 0xb98b66, wall: 0xff7566 }

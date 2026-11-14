@@ -1,9 +1,8 @@
 // drag.js — memilih dan menggeser furnitur dengan mouse atau sentuhan (raycasting).
 import * as THREE from 'three'
 import { renderer, camera } from './scene.js'
-import { SNAP } from './config.js'
 import { state } from './state.js'
-import { furniture, clampXZ, collides } from './furniture.js'
+import { furniture, clampXZ, collides, snapToGrid } from './furniture.js'
 import { select } from './ui.js'
 
 const raycaster = new THREE.Raycaster()
@@ -46,9 +45,8 @@ export function initDrag() {
       return
     }
     if (!raycaster.ray.intersectPlane(floorPlane, hitPoint)) return
-    const nx = Math.round((hitPoint.x + grabOffset.x) / SNAP) * SNAP
-    const nz = Math.round((hitPoint.z + grabOffset.z) / SNAP) * SNAP
-    const c = clampXZ(dragging, nx, nz)
+    const s = snapToGrid(dragging, hitPoint.x + grabOffset.x, hitPoint.z + grabOffset.z)
+    const c = clampXZ(dragging, s.x, s.z)
     const p = dragging.position
     // coba gerak penuh; kalau tabrakan, coba hanya sumbu X, lalu hanya sumbu Z
     if (!collides(dragging, c.x, c.z)) { p.x = c.x; p.z = c.z }

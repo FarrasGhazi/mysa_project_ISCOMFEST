@@ -54,3 +54,16 @@ canvas { display: block; touch-action: none; }
 #panel .row2 { display: flex; gap: 6px; }
 #panel .row2 label { flex: 1; }
 #panel button.wide { width: 100%; margin-top: 4px; }
+
+#panel select {
+  width: 100%; padding: 6px; margin-top: 2px;
+  border: 1px solid #ccc; border-radius: 6px; background: #fff;
+}
+#panel .hint { font-size: 12px; color: #666; margin: 4px 0 6px; }
+
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+  margin: 0 4px 0 8px; vertical-align: middle; }
+.dot:first-child { margin-left: 0; }
+.dot.red { background: #e64638; }
+.dot.green { background: #46c86e; }
+.dot.blue { background: #5a96ff; }
