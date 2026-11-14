@@ -7,6 +7,7 @@ import { setRoomSize } from './room.js'
 import { setGridStep, setGridVisible } from "./grid.js";
 import { setFloorModeVisible, setHideFurniture } from "./floormode.js";
 import { rotateView, setTopView } from "./view.js";
+import { exportPng } from "./exportpng.js";
 
 // ---------- Cari elemen HTML (ID harus sama persis dengan di index.html) ----------
 const editBox = document.getElementById('edit')
@@ -215,4 +216,7 @@ export function initUI() {
   inWalk.addEventListener('change', () => { state.dirty = true })
   chkHeat.addEventListener('change', () => setHeatVisible(chkHeat.checked))
   setHeatVisible(chkHeat.checked) // awal: sesuai kotak centang (kosong = nonaktif)
+
+  // Export PNG
+  document.getElementById('btn-export').addEventListener('click', exportPng)
 }

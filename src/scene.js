@@ -1,6 +1,6 @@
 // scene.js — panggung 3D: renderer, kamera, cahaya.
 import * as THREE from 'three'
-import { room, COLORS, view, viewSigns } from './config.js'
+import { room, COLORS, view, viewSigns, CAMERA } from './config.js'
 
 export const scene = new THREE.Scene()
 scene.background = new THREE.Color(COLORS.background)
@@ -42,7 +42,15 @@ export function fitCamera() {
   } else {
     // Isometrik: kamera di salah satu dari empat sudut
     camera.up.set(0, 1, 0)
-    camera.position.set(target.x + sx * 10, target.y + 10, target.z + sz * 10)
+    // Tiap sudut putar berjarak 90° dari sebelumnya, jadi bentuk ruangan tetap konsisten
+    const az = THREE.MathUtils.degToRad(CAMERA.azimuth - view.index * 90)
+    const el = THREE.MathUtils.degToRad(CAMERA.elevation)
+    const dist = 17.32 // jarak kamera ke pusat; ukuran tampilan diatur lewat viewSize, bukan jarak
+    camera.position.set(
+      target.x + dist * Math.cos(el) * Math.sin(az),
+      target.y + dist * Math.sin(el),
+      target.z + dist * Math.cos(el) * Math.cos(az)
+    )
     camera.lookAt(target)
     viewSize = Math.max(room.w, room.d) * 2
   }

@@ -49,3 +49,6 @@ export const PALETTE = [
   0x7fb77e, // hijau
   0xf2c14e, // kuning
 ]
+
+// Sudut kamera isometrik (derajat). azimut 45 = simetris; di bawah 45 dinding belakang lebih lebar.
+export const CAMERA = { azimuth: 22, elevation: 45 }

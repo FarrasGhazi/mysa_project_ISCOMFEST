@@ -19,3 +19,8 @@ export function updateMarker() {
   marker.rotation.y = sel.rotation.y
   marker.scale.set(w + 0.1, 1, d + 0.1)
 }
+
+// Sembunyikan penanda sesaat (dipakai saat ekspor gambar). Frame berikutnya mengatur ulang sendiri.
+export function hideMarker() {
+  marker.visible = false
+}
