@@ -26,3 +26,14 @@ export const CATALOG = {
   wardrobe: { label: 'Lemari',       w: 0.9, d: 0.5, h: 1.8 },
   chair:    { label: 'Kursi',        w: 0.4, d: 0.4, h: 0.9 },
 }
+
+// Sudut kamera: index 0-3 = empat sudut isometrik, top = tampilan atas
+export const view = { index: 0, top: false }
+
+const SIGNS = [[1, 1], [-1, 1], [-1, -1], [1, -1]] // sisi kamera terhadap pusat ruangan (x, z)
+
+export function viewSigns() {
+  if (view.top) return { sx: 1, sz: 1 }
+  const [sx, sz] = SIGNS[view.index]
+  return { sx, sz }
+}

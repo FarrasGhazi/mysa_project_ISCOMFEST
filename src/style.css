@@ -67,3 +67,5 @@ canvas { display: block; touch-action: none; }
 .dot.red { background: #e64638; }
 .dot.green { background: #46c86e; }
 .dot.blue { background: #5a96ff; }
+
+#panel button:disabled { opacity: 0.45; cursor: not-allowed; }

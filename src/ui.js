@@ -6,6 +6,7 @@ import { analyze, setHeatVisible } from './analysis.js'
 import { setRoomSize } from './room.js'
 import { setGridStep, setGridVisible } from "./grid.js";
 import { setFloorModeVisible, setHideFurniture } from "./floormode.js";
+import { rotateView, setTopView } from "./view.js";
 
 // ---------- Cari elemen HTML (ID harus sama persis dengan di index.html) ----------
 const editBox = document.getElementById('edit')
@@ -119,10 +120,12 @@ export function refreshAnalysis() {
 export function initUI() {
   document.getElementById('btn-room').addEventListener('click', applyRoomSize)
   syncRoomInputs()
+
   const selGrid = document.getElementById('sel-grid')
   const chkGrid = document.getElementById('chk-grid')
   selGrid.addEventListener('change', () => setGridStep(parseInt(selGrid.value, 10)))
   chkGrid.addEventListener('change', () => setGridVisible(chkGrid.checked))
+
   const chkFloor = document.getElementById('chk-floor')
   const chkHide = document.getElementById('chk-hide')
   chkFloor.addEventListener('change', () => {
@@ -134,6 +137,20 @@ export function initUI() {
   chkHide.disabled = !chkFloor.checked
   setHideFurniture(chkHide.checked)
   setFloorModeVisible(chkFloor.checked)
+
+  const btnLeft = document.getElementById('btn-view-left')
+  const btnRight = document.getElementById('btn-view-right')
+  const chkTop = document.getElementById('chk-top')
+  btnLeft.addEventListener('click', () => rotateView(1))
+  btnRight.addEventListener('click', () => rotateView(-1))
+  chkTop.addEventListener('change', () => {
+    setTopView(chkTop.checked)
+    btnLeft.disabled = chkTop.checked // putar sudut hanya untuk tampilan isometrik
+    btnRight.disabled = chkTop.checked
+  })
+  // sinkronkan saat halaman dibuka (browser kadang mengingat centangnya)
+  btnLeft.disabled = btnRight.disabled = chkTop.checked
+  setTopView(chkTop.checked)
   
   for (const input of [inW, inD, inH]) input.addEventListener('change', applySize)
 

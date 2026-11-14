@@ -1,7 +1,7 @@
 // grid.js — garis grid berskala di lantai dan label panjang (1 m, 2 m, ...) di tepi.
 import * as THREE from 'three'
 import { scene } from './scene.js'
-import { room, grid } from './config.js'
+import { room, grid, viewSigns } from './config.js'
 
 const Y = 0.003 // sedikit di atas lantai supaya garis tidak "berkedip"
 const OPACITY = { minor: 0.2, mid: 0.4, major: 0.75 } // tipis, sedang (50 cm), tebal (1 m)
@@ -78,16 +78,18 @@ export function buildGrid() {
     group.add(new THREE.LineSegments(geometry, material))
   }
 
-  // Label tiap 1 m di dua tepi yang menghadap kamera
+  // Label tiap 1 m di dua tepi yang paling dekat dengan kamera
+  const { sx, sz } = viewSigns()
   const h = Math.max(room.w, room.d) * 0.07
+  const gap = h * 1.2 + room.wallT
   for (let m = 1; m * 100 < widthCm; m++) {
     const label = makeLabel(`${m} m`, h)
-    label.position.set(m, 0.02, room.d + h * 1.2)
+    label.position.set(m, 0.02, sz > 0 ? room.d + gap : -gap)
     group.add(label)
   }
   for (let m = 1; m * 100 < depthCm; m++) {
     const label = makeLabel(`${m} m`, h)
-    label.position.set(room.w + h * 1.2, 0.02, m)
+    label.position.set(sx > 0 ? room.w + gap : -gap, 0.02, m)
     group.add(label)
   }
 
