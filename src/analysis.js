@@ -84,7 +84,7 @@ export function analyze(walkMinCm) {
   }
 
   // BFS dari tengah area ayun pintu
-  const si = Math.floor(door.x / CELL)
+  const si = Math.floor(door.pos / CELL)
   const sj = Math.floor(Math.max(door.w / 2, r) / CELL)
   const start = sj * nx + si
   const reach = new Uint8Array(total)

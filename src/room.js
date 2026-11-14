@@ -43,8 +43,8 @@ export function buildRoom() {
   for (const wall of Object.values(walls)) wall.castShadow = false // dinding tidak membuat bayangan
 
   doorParts = [
-    addBox(door.w, 2.0, 0.04, 0xf4efe6, door.x, 1.0, 0.02),                    // daun pintu
-    addBox(0.06, 0.06, 0.06, 0xd9a441, door.x - door.w / 2 + 0.13, 1.0, 0.07), // gagang
+    addBox(door.w, 2.0, 0.04, 0xf4efe6, door.pos, 1.0, 0.02),                    // daun pintu
+    addBox(0.06, 0.06, 0.06, 0xd9a441, door.pos - door.w / 2 + 0.13, 1.0, 0.07), // gagang
   ]
 
   applyWallVisibility()
@@ -65,7 +65,7 @@ export function setRoomSize(w, d) {
   room.w = w
   room.d = d
   const margin = 0.1 + door.w / 2
-  door.x = Math.min(Math.max(door.x, margin), w - margin)
+  door.pos = Math.min(Math.max(door.pos, margin), w - margin)
   buildRoom()
   buildGrid()
   fitCamera()
