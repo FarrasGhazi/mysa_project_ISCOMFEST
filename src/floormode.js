@@ -18,6 +18,28 @@ const redMaterial = new THREE.MeshBasicMaterial({
   color: 0xe64638, transparent: true, opacity: 0.6, depthTest: false, depthWrite: false,
 })
 
+// Garis tepi juring pintu, digambar paling atas supaya tetap terlihat saat ditimpa furnitur.
+// transparent: true supaya urutan gambarnya (renderOrder) berlaku dan garis berada di atas bidang merah.
+const outlineMaterial = new THREE.LineBasicMaterial({
+  color: 0x1b3fa0, transparent: true, depthTest: false, depthWrite: false,
+})
+
+// Garis: engsel -> busur 90° -> kembali ke engsel
+function makeSwingOutline(s) {
+  const start = Math.atan2(s.az, s.ax)
+  const sign = s.ax * s.nz - s.az * s.nx < 0 ? -1 : 1 // arah busur yang pendek (90°)
+  const STEPS = 24
+  const points = [new THREE.Vector3(s.hx, 0.006, s.hz)]
+  for (let i = 0; i <= STEPS; i++) {
+    const angle = start + sign * (Math.PI / 2) * (i / STEPS)
+    points.push(new THREE.Vector3(s.hx + Math.cos(angle) * s.r, 0.006, s.hz + Math.sin(angle) * s.r))
+  }
+  points.push(points[0].clone())
+  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), outlineMaterial)
+  line.renderOrder = 6
+  return line
+}
+
 // Buat bidang lantai baru kalau ukuran ruangan berubah
 function ensureFloor() {
   const pw = Math.round(room.w * PX)
@@ -69,8 +91,8 @@ function applyFurnitureVisibility() {
 function drawSwing(ctx, s) {
   const cx = s.hx * PX
   const cy = s.hz * PX
-  const from = Math.atan2(s.az, s.ax)               // sudut arah daun pintu
-  const to = Math.atan2(s.nz, s.nx)                 // sudut arah ke dalam ruangan
+  const from = Math.atan2(s.az, s.ax) // sudut arah daun pintu
+  const to = Math.atan2(s.nz, s.nx) // sudut arah ke dalam ruangan
   const anticlockwise = s.ax * s.nz - s.az * s.nx < 0 // pilih busur 90° yang pendek
   ctx.beginPath()
   ctx.moveTo(cx, cy)
@@ -108,6 +130,10 @@ export function refreshFloorMode() {
     red.renderOrder = 5
     redGroup.add(red)
   }
+
+  // 4. garis tepi juring pintu, di atas jejak merah
+  redGroup.add(makeSwingOutline(doorSwing()))
+
   f.tex.needsUpdate = true
 }
 

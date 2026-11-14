@@ -1,7 +1,7 @@
 // ui.js — panel HTML: tombol, kolom input, dan tampilan hasil analisis.
 import { CATALOG, room, door, doorRange, PALETTE } from './config.js'
 import { state } from './state.js'
-import { addFurniture, removeFurniture, rebuild, clampXZ, collides, countNewlyOutside, mainColor } from './furniture.js'
+import { addFurniture, removeFurniture, rebuild, clampXZ, collides, countNewlyOutside, mainColor, furniture, touchesDoorSwing } from './furniture.js'
 import { setRoomSize, buildRoom } from './room.js'
 import { setGridStep, setGridVisible } from "./grid.js";
 import { setFloorModeVisible, setHideFurniture } from "./floormode.js";
@@ -171,6 +171,16 @@ function applyDoor() {
   syncDoorInputs()
   buildRoom()
   state.dirty = true
+}
+
+// Peringatan area ayun pintu: hanya muncul saat berpindah dari "aman" ke "menimpa"
+let swingBlocked = false
+export function refreshDoorWarning() {
+  const blocked = furniture.some((item) => touchesDoorSwing(item, item.position.x, item.position.z))
+  if (blocked && !swingBlocked) {
+    toast('Furnitur masuk area ayun pintu. Pastikan pintu tetap bisa dibuka')
+  }
+  swingBlocked = blocked
 }
 
 // ---------- Pasang semua event (dijalankan sekali saat halaman dibuka) ----------
