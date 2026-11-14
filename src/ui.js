@@ -2,7 +2,6 @@
 import { CATALOG, room, PALETTE } from './config.js'
 import { state } from './state.js'
 import { addFurniture, removeFurniture, rebuild, clampXZ, collides, countNewlyOutside, mainColor } from './furniture.js'
-import { analyze, setHeatVisible } from './analysis.js'
 import { setRoomSize } from './room.js'
 import { setGridStep, setGridVisible } from "./grid.js";
 import { setFloorModeVisible, setHideFurniture } from "./floormode.js";
@@ -15,11 +14,6 @@ const selName = document.getElementById('sel-name')
 const inW = document.getElementById('in-w')
 const inD = document.getElementById('in-d')
 const inH = document.getElementById('in-h')
-const inWalk = document.getElementById('in-walk')
-const chkHeat = document.getElementById('chk-heat')
-const verdictEl = document.getElementById('verdict')
-const scoreEl = document.getElementById('score')
-const notesEl = document.getElementById('notes')
 const toastEl = document.getElementById('toast')
 const swatchBox = document.getElementById('swatches')
 const inColor = document.getElementById('in-color')
@@ -136,15 +130,6 @@ function applyRoomSize() {
   state.dirty = true
 }
 
-// ---------- Tampilkan hasil analisis di panel ----------
-export function refreshAnalysis() {
-  const result = analyze(parseFloat(inWalk.value))
-  verdictEl.className = `badge ${result.status}`
-  verdictEl.textContent = result.text
-  scoreEl.textContent = `Skor kelegaan: ${result.score}%`
-  notesEl.innerHTML = result.notes.map((n) => `<li>${n}</li>`).join('')
-}
-
 // ---------- Pasang semua event (dijalankan sekali saat halaman dibuka) ----------
 export function initUI() {
   document.getElementById('btn-room').addEventListener('click', applyRoomSize)
@@ -223,10 +208,6 @@ export function initUI() {
       else toast('Ruangan penuh, tidak ada tempat kosong')
     })
   })
-
-  inWalk.addEventListener('change', () => { state.dirty = true })
-  chkHeat.addEventListener('change', () => setHeatVisible(chkHeat.checked))
-  setHeatVisible(chkHeat.checked) // awal: sesuai kotak centang (kosong = nonaktif)
 
   // Export PNG
   document.getElementById('btn-export').addEventListener('click', exportPng)

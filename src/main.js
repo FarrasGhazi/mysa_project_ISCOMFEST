@@ -2,7 +2,7 @@
 import './style.css'
 import { renderer, scene, camera } from './scene.js'
 import { buildRoom } from './room.js'
-import { initUI, refreshAnalysis } from './ui.js'
+import { initUI } from './ui.js'
 import { initDrag } from './drag.js'
 import { updateMarker } from './marker.js'
 import { state } from './state.js'
@@ -18,7 +18,7 @@ initDrag()  // sambungkan mouse
 // Loop gambar: jalan ~60 kali per detik
 function animate() {
   requestAnimationFrame(animate)
-    if (state.dirty) { refreshOutside(); refreshFloorMode(); refreshAnalysis(); state.dirty = false }
+    if (state.dirty) { refreshOutside(); refreshFloorMode(); state.dirty = false }
   updateMarker()
   renderer.render(scene, camera)
 }
