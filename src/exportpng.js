@@ -11,6 +11,6 @@ export function exportPng() {
   // Unduh lewat tautan sementara yang diklik lewat kode
   const link = document.createElement('a')
   link.href = url
-  link.download = `kosplanner-${Math.round(room.w * 100)}x${Math.round(room.d * 100)}.png`
+  link.download = `MYSA-${Math.round(room.w * 100)}x${Math.round(room.d * 100)}.png`
   link.click()
 }
